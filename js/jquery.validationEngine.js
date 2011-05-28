@@ -55,6 +55,7 @@
 						// bind fields
                         form.find("[class*=validate]:not([type=checkbox])").bind(options.validationEventTrigger, methods._onFieldEvent);
                         form.find("[class*=validate][type=checkbox]").bind("click", methods._onFieldEvent);
+                        form.find("[class*=validate]").bind("focus", methods._onFocusdEvent);
 
                         // bind form.submit
                         form.bind("submit", methods._onSubmitEvent);
@@ -62,6 +63,7 @@
                         // bind fields with LIVE (for persistant state)
                         form.find("[class*=validate]:not([type=checkbox])").live(options.validationEventTrigger, methods._onFieldEvent);
                         form.find("[class*=validate][type=checkbox]").live("click", methods._onFieldEvent);
+                        form.find("[class*=validate]").live("focus", methods._onFocusdEvent);
 
                         // bind form.submit
                         form.live("submit", methods._onSubmitEvent);
@@ -82,13 +84,15 @@
                 // unbind fields
                 form.find("[class*=validate]").not("[type=checkbox]").unbind(options.validationEventTrigger, methods._onFieldEvent);
                 form.find("[class*=validate][type=checkbox]").unbind("click", methods._onFieldEvent);
+                form.find("[class*=validate]").unbind("focus", methods._onFocusdEvent);
                 // unbind form.submit
                 form.unbind("submit", methods.onAjaxFormComplete);
                 
                
                 // unbind live fields (kill)
                 form.find("[class*=validate]").not("[type=checkbox]").die(options.validationEventTrigger, methods._onFieldEvent);
-                form.find("[class*=validate][type=checkbox]").die("click", methods._onFieldEvent);
+                form.find("[class*=validate][type=checkbox]").die("click", methods._onFieldEvent); 
+                form.find("[class*=validate]").die("focus", methods._onFocusdEvent);
                 // unbind form.submit
                 form.die("submit", methods.onAjaxFormComplete);
                 
@@ -185,6 +189,16 @@
             // validate the current field
             methods._validateField(field, options);
         },
+        /**
+         * Called when field get focus
+         */
+	_onFocusdEvent: function(){            
+		var options = $(this).closest('form').data('jqv');			
+		var closingtag = $(this).attr("id");
+		if (!options.hideOnFocus) return;
+		if (closingtag )
+			$('.'+closingtag+"formError").fadeTo("fast", 0.3, function() {$(this).remove();});
+	},
         /**
          * Called when the form is submited, shows prompts accordingly
          *
@@ -1249,6 +1263,8 @@
                 onBeforeAjaxFormValidation: $.noop,
                 // Stops form from submitting and execute function assiciated with it
                 onValidationComplete: false,
+		// hide the error if the field add focus
+		hideOnFocus:true,
 
                 // Used when the form is displayed within a scrolling DIV
                 isOverflown: false,
